@@ -1,8 +1,8 @@
 package Supplier
 
 import java.util.{Collections, Properties}
-import System.JsonUtil._
 
+import System.JsonUtil._
 import System.ProducerApp
 
 import scala.io.StdIn._
@@ -14,6 +14,7 @@ import org.mongodb.scala.{MongoClient, MongoCollection, MongoDatabase}
 import System.Helpers._
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.bson.codecs.configuration.CodecRegistry
+import org.joda.time.DateTime
 
 import scala.collection.JavaConverters._
 
@@ -69,6 +70,7 @@ object AddSupplierProducts{
 
       var products = Seq[Product]()
       ProducerApp.fromFile(Array(filePath + fileName))
+      val startTime = DateTime.now.getMillis
       while (flag) {
         val records = consumer.poll(100)
         for (record <- records.asScala) {
@@ -81,6 +83,7 @@ object AddSupplierProducts{
         if (products.nonEmpty) collection.insertMany(products).results()
         products = Seq[Product]()
       }
+      println("time taken: ", DateTime.now.getMillis - startTime)
     }
     else if (readType == "d") {
       print("enter number of products")
